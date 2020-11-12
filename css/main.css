@@ -10,8 +10,8 @@ canvas#game {
   display:block;
   margin:auto;
   margin-top:5vh;
-  width:160vh;
+  /*width:160vh;
   max-width:96vw;
   height:90vh;
-  max-height:54vw;
+  max-height:54vw;*/
 }
