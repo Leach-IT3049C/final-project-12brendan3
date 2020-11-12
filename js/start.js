@@ -15,9 +15,12 @@ function drawMainMenu() {
     clearCanvas();
     const circleRad = (canvas.height / 2) * 0.60;
     circlePath.arc((canvas.width / 2), (canvas.height / 2), circleRad, 0, 2 * Math.PI);
-    context.fillStyle = `#6600CC`;
+    context.fillStyle = `#60C`;
     context.fill(circlePath);
-    context.fillStyle = `#FFFFFF`;
+    context.strokeStyle = `#FFF`;
+    context.lineWidth = circleRad * 0.05;
+    context.stroke(circlePath);
+    context.fillStyle = `#FFF`;
     const textHeight = circleRad * 0.3;
     context.font = `${textHeight}px arial`;
     context.textAlign = `center`;
@@ -25,7 +28,7 @@ function drawMainMenu() {
 }
 
 function clearCanvas() {
-    context.fillStyle = `#000000`;
+    context.fillStyle = `#000`;
     context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
