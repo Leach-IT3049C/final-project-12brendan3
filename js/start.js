@@ -12,7 +12,7 @@ canvas.addEventListener(`click`, (clickEvent) => {
 });
 
 function drawMainMenu() {
-    clearCanvas();
+    console.log(`Drawing....`);
     const circleRad = (canvas.height / 2) * 0.60;
     circlePath.arc((canvas.width / 2), (canvas.height / 2), circleRad, 0, 2 * Math.PI);
     context.fillStyle = `#60C`;
@@ -25,17 +25,18 @@ function drawMainMenu() {
     context.font = `${textHeight}px arial`;
     context.textAlign = `center`;
     context.fillText(`Click To Play`, (canvas.width / 2), (canvas.height / 2) + (textHeight * 0.8 / 2));
+    console.log(`Drawed!`);
 }
 
 function clearCanvas() {
-    context.fillStyle = `#000`;
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    console.log(`Clearing....`);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.beginPath();
+    context.moveTo(0,0);
+    console.log(`Cleared!`);
 }
 
 function resize() {
-
-    clearCanvas();
-
     let width = document.documentElement.clientHeight * 1.6;
     let maxWidth = document.documentElement.clientWidth * 0.96;
     let height = document.documentElement.clientHeight * 0.9;
@@ -52,6 +53,9 @@ function resize() {
     canvas.width = width;
     canvas.height = height;
 
+    console.log(`Clear!`);
+    clearCanvas();
+    console.log(`Draw!`);
     drawMainMenu();
 }
 
