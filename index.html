@@ -6,11 +6,23 @@
 
     <link rel="stylesheet" type="text/css" href="css/main.css"/>
 
+    <audio id="hit-sound">
+      <source src="sounds/hit.ogg" type="audio/ogg">
+    </audio>
+
+    <audio id="song">
+    </audio>
+
     <meta charset="UTF-8"/>
   </head>
 
   <body>
     <canvas id="game"></canvas>
-    <script src="js/start.js"></script>
+    <script type="text/javascript" src="js/lib/zip.js"></script>
+    <script type="text/javascript" src="js/button-manager.js"></script>
+    <script type="text/javascript" src="js/canvas-drawer.js"></script>
+    <script type="text/javascript" src="js/map-reader.js"></script>
+    <script type="text/javascript" src="js/level-select.js"></script>
+    <script type="text/javascript" src="js/start.js"></script>
   </body>
 </html>
