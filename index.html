@@ -2,27 +2,33 @@
 
 <html lang="EN">
   <head>
-    <title>osu! clone</title>
-
+    <title>osu?</title>
     <link rel="stylesheet" type="text/css" href="css/main.css"/>
+    <meta charset="UTF-8"/>
+    <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
+    <link rel="manifest" href="img/site.webmanifest">
+  </head>
 
+  <body ondrop="dropHandler(event);" ondragover="dragHandler(event);">
     <audio id="hit-sound">
       <source src="sounds/hit.ogg" type="audio/ogg">
     </audio>
-
     <audio id="song">
+      <source id="songSource" src="sounds/welcome.mp3" type="audio/mp3">
     </audio>
-
-    <meta charset="UTF-8"/>
-  </head>
-
-  <body>
+    <div class="slidecontainer" style="color:white;">
+      Temp Volume Slider: <input type="range" min="1" max="100" value="10" class="slider" id="soundRange">
+    </div>
     <canvas id="game"></canvas>
     <script type="text/javascript" src="js/lib/zip.js"></script>
+    <script type="text/javascript" src="js/lib/zip-ext.js"></script>
     <script type="text/javascript" src="js/button-manager.js"></script>
     <script type="text/javascript" src="js/canvas-drawer.js"></script>
-    <script type="text/javascript" src="js/map-reader.js"></script>
+    <script type="text/javascript" src="js/level-reader.js"></script>
     <script type="text/javascript" src="js/level-select.js"></script>
+    <script type="text/javascript" src="js/gameplay-osu.js"></script>
     <script type="text/javascript" src="js/start.js"></script>
   </body>
 </html>

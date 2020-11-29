@@ -4,7 +4,7 @@ const context = canvas.getContext(`2d`);
 
 let rect = canvas.getBoundingClientRect();
 
-buttonPaths = [];
+buttonPaths = []; // Something like this shouldn't be done in production - this is a "hack" (the use of this variable)
 
 function drawButtons() { // Draws all buttons in array from button manager
   clear();
@@ -78,7 +78,7 @@ window.addEventListener(`resize`, (resizeEvent) => {
 
 canvas.addEventListener(`click`, (clickEvent) => {
   let clickedButton = null;
-  for (let i = 0; i < buttonPaths.length; i++) {
+  for (let i = buttonPaths.length - 1; i > -1; i--) {
     if (context.isPointInPath(buttonPaths[i], clickEvent.x - rect.left, clickEvent.y - rect.top)) {
       clickedButton = i;
       break;
