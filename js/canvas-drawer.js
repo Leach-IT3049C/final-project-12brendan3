@@ -3,6 +3,7 @@ const canvas = document.getElementById(`game`);
 const context = canvas.getContext(`2d`);
 
 let rect = canvas.getBoundingClientRect();
+let mousePos = {x: 0, y: 0};
 
 buttonPaths = []; // Something like this shouldn't be done in production - this is a "hack" (the use of this variable)
 
@@ -72,14 +73,23 @@ function resize() {
   drawButtons();
 }
 
-window.addEventListener(`resize`, (resizeEvent) => {
+window.addEventListener(`resize`, () => {
   resize();
 });
 
-canvas.addEventListener(`click`, (clickEvent) => {
+window.addEventListener(`keydown`, this.handleClick, false);
+
+canvas.addEventListener(`click`, handleClick);
+
+canvas.addEventListener(`mousemove`, (moveEvent) => {
+  mousePos.x = moveEvent.clientX - rect.left;
+  mousePos.y = moveEvent.clientY - rect.top;
+});
+
+function handleClick() {
   let clickedButton = null;
   for (let i = buttonPaths.length - 1; i > -1; i--) {
-    if (context.isPointInPath(buttonPaths[i], clickEvent.x - rect.left, clickEvent.y - rect.top)) {
+    if (context.isPointInPath(buttonPaths[i], mousePos.x, mousePos.y)) {
       clickedButton = i;
       break;
     }
@@ -91,4 +101,4 @@ canvas.addEventListener(`click`, (clickEvent) => {
     }
     triggerButton(clickedButton);
   }
-});
+}
