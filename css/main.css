@@ -10,11 +10,7 @@ canvas#game {
   display:block;
   margin:auto;
   margin-top:5vh;
-  /*
-  background-color:#FFFFFF;
-  width:160vh;
-  max-width:96vw;
-  height:90vh;
-  max-height:54vw;
+  /* Debug Style
+  background-color:#000000;
   */
 }

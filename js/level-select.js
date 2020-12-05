@@ -2,6 +2,8 @@ let currentPage = 1;
 
 
 function drawLevelSelect() {
+  currentGameMode = `LevelSelect`;
+
   clearButtons();
   addRectButton(0.975, 0.975, 0.05, 0.05, `#60C`, `Back`, 0.015, () => { // Back button
     drawMainMenu();
@@ -66,6 +68,4 @@ function drawLevelSelect() {
     drawLevelSelect();
     // Pages down
   }, false);
-
-  drawButtons();
 }

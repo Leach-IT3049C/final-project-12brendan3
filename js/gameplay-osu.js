@@ -1,12 +1,22 @@
 
 let hitObjects = [];
-let beatLength = 0; //time in Milliseconds
+let difficulty = {};
+let timing = [];
+let objectsLeft = 0;
+let color = `#FF2BF4`;
+let score = 0;
+let combo = 0;
 
 
 function startGameOsu(level) {
   clearButtons();
   hitObjects = [];
-  beatLength = 0;
+  difficulty = {};
+  timing = [];
+  objectsLeft = 0;
+  score = 0;
+  combo = 0;
+  currentGameMode = `osu!`;
   readLevelData(level);
 }
 
@@ -47,56 +57,125 @@ async function readLevelData(level) {
   let lines = level.data.split('\r\n')
 
   let currentType = 0;
-  let hitObjects = [];
 
   for (let i = 0; i < lines.length; i++) {
-    if (lines[i] === `[HitObjects]`){
+    if (lines[i] === `[Difficulty]`){
+      currentType = 5;
+    } else if (currentType === 5 && lines[i].startsWith(`SliderMultiplier:`)) {
+      difficulty.sliderMultiplier = lines[i].substr(17);
+    }
+    
+    if (lines[i] === `[TimingPoints]`) {
+      currentType = 6;
+    } else if (currentType === 6 && lines[i]) {
+      const timingPoint = lines[i].split(`,`);
+      if (timingPoint[6] === `1`) {
+        timing.push({beatLength: timingPoint[1]});
+      } else {
+        timing.push({beatLength: difficulty.sliderMultiplier * (-timingPoint[1]) / 100});
+      }
+    }
+
+    if (lines[i] === `[HitObjects]`) {
       currentType = 7;
     } else if (currentType === 7 && lines[i]) {
       hitObjects.push(lines[i]);
     }
-    if (lines[i] === `[TimingPoints]`){
-      currentType = 6;
-    } else if (currentType === 6 && lines[i]) {
-      let timingPoint = lines[i].split(`,`)
-      beatLength = timingPoint[1];
-    }
   }
 
-  doDaThings(parseHitObjects(hitObjects));
+  startMap(parseHitObjects(hitObjects));
 }
 
-function doDaThings(circles) {
+function startMap(circles) {
   song.play();
+  let offset = 0;
   for (let i = 0; i < circles.length; i++) {
-    console.log(`Waiting: ${circles[i].time-beatLength} milliseconds`);
-    setTimeout(() => {
-      addCircleButton(circles[i].x, circles[i].y, 0.05, `#FF2BF4`, i + 1, 0.010, () => {
-        console.log(`WHEE!`);
-      });
-      /*
+    if (circles[i].type === 0) {
       setTimeout(() => {
-        console.log(`Remove ${i+1} Circle`)//Add ID's to Circles so we can remove them
-        //Remove button
-        clearButtons();//Temp
-        drawButtons();
-      },(beatLength + 500));
-      */
-      drawButtons();
-    }, circles[i].time - beatLength - 500);
+        objectsLeft--;
+        let circleRemoveTimeout;
+
+        const timeAdded = totalTimePassed;
+
+        const buttonID = addCircleButton(circles[i].x, circles[i].y, 0.045, `#FF2BF4`, i + 1 - offset, 0.04, () => {
+          clearTimeout(circleRemoveTimeout);
+          removeHitCircle(buttonID);
+          const timeOff = totalTimePassed - timeAdded - timing[0].beatLength;
+          circleHit(timeOff);
+          checkEnd(1);
+        });
+
+        addHitCircle(buttonID, circles[i].x, circles[i].y, 0.045, `#FF2BF4`, timing[0].beatLength);
+
+        circleRemoveTimeout = setTimeout(() => {
+          removeButton(buttonID);
+          circleMiss();
+          checkEnd(0);
+        }, timing[0].beatLength * 2);
+      }, circles[i].time - timing[0].beatLength);
+    }
   }
+}
+
+function circleHit(timeOff) {
+  combo++;
+  let hitValue = 0;
+
+  const timingBad = timing[0].beatLength * 0.625;
+  const timingGood = timing[0].beatLength * 0.25;
+  const absoluteTimeOff = Math.abs(timeOff);
+
+  if (absoluteTimeOff >= timingBad) {
+    hitValue = 50;
+  } else if (absoluteTimeOff >= timingGood) {
+    hitValue = 100;
+  } else {
+    hitValue = 300;
+  }
+
+  score += hitValue + (combo - 1) * hitValue;
+}
+
+function circleMiss() {
+  combo = 0;
 }
 
 function parseHitObjects(hitObjects) {
   let objs = [];
+  let lastX = -1;
+  let lastY = -1;
   for(let i = 0; i < hitObjects.length; i++) {
     let temp = hitObjects[i].split(`,`);
-    objs.push({
-      x: temp[0]/640 + 0.1,//x Position on 640x480 resolution
-      y: temp[1]/480,//y Position on 640x480 resolution
-      time: temp[2],//Time
-      type: temp[3]//Type Circle = 0
-    })
+    let hitObjectType = null;
+
+    if (temp[3] == 0) {
+      hitObjectType = 0;
+    } else if (temp[3] == 1 && temp.length < 7) {
+      hitObjectType = 0;
+    } else if ((temp[3] > 3 && temp[3] < 7) || temp[3] == 2) {
+      hitObjectType = 0;
+    }
+
+    if (hitObjectType !== null) {
+      objs.push({
+        x: temp[0] === lastX ? temp[0]/512 * 0.6 + 0.21 : temp[0]/512 * 0.6 + 0.2,
+        y: temp[1] === lastY ? temp[1]/384 * 0.8 + 0.11 : temp[1]/384 * 0.8 + 0.1,
+        time: temp[2],
+        type: hitObjectType
+      });
+
+      lastX = temp[0];
+      lastY = temp[1];
+      
+      objectsLeft++;
+    }
   }
   return objs;
+}
+
+function checkEnd(buttonsLeft) {
+  if (objectsLeft <= 0 && buttons.length <= buttonsLeft) {
+    console.log(`End score: ${score}`);
+    drawLevelSelect();
+  } 
 }

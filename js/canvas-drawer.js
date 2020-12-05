@@ -5,12 +5,36 @@ const context = canvas.getContext(`2d`);
 let rect = canvas.getBoundingClientRect();
 let mousePos = {x: 0, y: 0};
 
-buttonPaths = []; // Something like this shouldn't be done in production - this is a "hack" (the use of this variable)
+let currentTime = 1;
+let lastTime = currentTime;
+let timePassed = 0;
+let totalTimePassed = 0;
+let currentGameMode = `MainMenu`;
+
+window.requestAnimationFrame(updateScreen);
+
+function updateScreen(time) {
+  currentTime = time;
+  timePassed = currentTime - lastTime;
+  totalTimePassed += timePassed;
+
+  drawButtons();
+
+  if (currentGameMode !== `MainMenu`) {
+    drawFPS();
+  }
+
+  if (currentGameMode === `osu!`) {
+    drawHitCircles();
+    drawScore();
+    drawCombo();
+  }
+
+  window.requestAnimationFrame(updateScreen);
+}
 
 function drawButtons() { // Draws all buttons in array from button manager
   clear();
-
-  buttonPaths = [];
   
   for (let i = 0; i < buttons.length; i++) {
     const path = new Path2D();
@@ -36,7 +60,7 @@ function drawButtons() { // Draws all buttons in array from button manager
       console.error(`Not a supported shape, 5head.`);
     }
 
-    buttonPaths.push(path);
+    buttons[i].path = path;
 
     const textSize = buttons[i].textSize * canvas.width;
 
@@ -44,6 +68,47 @@ function drawButtons() { // Draws all buttons in array from button manager
     context.font = `${textSize}px arial`;
     context.textAlign = `center`;
     context.fillText(buttons[i].text, (canvas.width * buttons[i].x), (canvas.height * buttons[i].y) + (textSize * 0.75 / 2));
+  }
+}
+
+function drawFPS() {
+  const FPS = 1000 / (currentTime - lastTime);
+  lastTime = currentTime;
+  context.fillStyle = `#FFF`;
+  context.font = `${0.01 * canvas.width}px arial`;
+  context.textAlign = `left`;
+  context.fillText(`FPS: ${FPS.toFixed(0)}`, (canvas.width * 0.005), (canvas.height * 0.02));
+}
+
+function drawScore(){
+  context.fillStyle = `#FFF`;
+  context.font = `${0.02 * canvas.width}px arial`;
+  context.textAlign = `left`;
+  context.fillText(`Score: ${score}`, (canvas.width * 0.8), (canvas.height * 0.05));
+}
+
+function drawCombo() {
+  context.fillStyle = `#FFF`;
+  context.font = `${0.03 * canvas.width}px arial`;
+  context.textAlign = `left`;
+  context.fillText(`x${combo}`, (canvas.width * 0.01), (canvas.height * 0.98));
+}
+
+function drawHitCircles() {
+  for (let i = 0; i < hitCircles.length; i++) {
+    hitCircles[i].usedTime ? hitCircles[i].usedTime += timePassed : hitCircles[i].usedTime = timePassed;
+
+    if (hitCircles[i].beatLength < hitCircles[i].usedTime) {
+      removeHitCircle(hitCircles[i].id);
+    } else {
+      const path = new Path2D();
+      const radius = hitCircles[i].radius * canvas.width * (1 + 3 * (hitCircles[i].beatLength - hitCircles[i].usedTime) / hitCircles[i].beatLength);
+      path.arc((canvas.width * hitCircles[i].x), (canvas.height * hitCircles[i].y), radius, 0, 2 * Math.PI);
+
+      context.strokeStyle = hitCircles[i].color;
+      context.lineWidth = radius * 0.05;
+      context.stroke(path);
+    }
   }
 }
 
@@ -69,15 +134,13 @@ function resize() {
   canvas.height = height;
 
   rect = canvas.getBoundingClientRect();
-
-  drawButtons();
 }
 
 window.addEventListener(`resize`, () => {
   resize();
 });
 
-window.addEventListener(`keydown`, this.handleClick, false);
+window.addEventListener(`keydown`, handleClick, false);
 
 canvas.addEventListener(`click`, handleClick);
 
@@ -88,17 +151,14 @@ canvas.addEventListener(`mousemove`, (moveEvent) => {
 
 function handleClick() {
   let clickedButton = null;
-  for (let i = buttonPaths.length - 1; i > -1; i--) {
-    if (context.isPointInPath(buttonPaths[i], mousePos.x, mousePos.y)) {
-      clickedButton = i;
+  for (let i = buttons.length - 1; i > -1; i--) {
+    if (context.isPointInPath(buttons[i].path, mousePos.x, mousePos.y)) {
+      clickedButton = buttons[i].id;
       break;
     }
   }
 
   if (clickedButton !== null) {
-    if (buttons[clickedButton].remove) {
-      buttonPaths.splice(clickedButton, 1);
-    }
     triggerButton(clickedButton);
   }
 }

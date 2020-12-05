@@ -2,9 +2,7 @@ let levelList = [];
 
 async function readLevels() {
   const defaultLevel = await getDefaultLevel();
-  console.log(defaultLevel);
   levelList = levelList.concat(defaultLevel);
-  console.log(levelList);
 }
 
 function readLevelZip(reader) {
@@ -83,11 +81,6 @@ function getDefaultLevel() {
       resolve([]);
     });
   });
-}
-
-function getLevels() { // Gets levels from maps
-  console.log(levelList);
-  return levelList;
 }
 
 function readLevelFile(file) {
