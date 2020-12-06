@@ -155,6 +155,11 @@ window.addEventListener(`keydown`, handleClick, false);
 
 canvas.addEventListener(`click`, handleClick);
 
+canvas.addEventListener('contextmenu', (event) => {
+  event.preventDefault();
+  handleClick();
+});
+
 canvas.addEventListener(`mousemove`, (moveEvent) => {
   mousePos.x = moveEvent.clientX - rect.left;
   mousePos.y = moveEvent.clientY - rect.top;
