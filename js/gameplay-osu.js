@@ -3,7 +3,7 @@ let hitObjects = [];
 let difficulty = {};
 let timing = [];
 let objectsLeft = 0;
-let color = `#FF2BF4`;
+let circleColor = `#87007A`;
 let score = 0;
 let combo = 0;
 
@@ -16,6 +16,7 @@ function startGameOsu(level) {
   objectsLeft = 0;
   score = 0;
   combo = 0;
+  circleColor = `#87007A`;
   currentGameMode = `osu!`;
   readLevelData(level);
 }
@@ -94,7 +95,12 @@ function startMap(circles) {
 
         const timeAdded = totalTimePassed;
 
-        const buttonID = addCircleButton(circles[i].x, circles[i].y, 0.045, `#FF2BF4`, i + 1 - offset, 0.04, () => {
+        if (circles[i].cycle) {
+          cycleCircleColors();
+          offset = i;
+        }
+
+        const buttonID = addCircleButton(circles[i].x, circles[i].y, 0.045, circleColor, i + 1 - offset, 0.04, () => {
           clearTimeout(circleRemoveTimeout);
           removeHitCircle(buttonID);
           const timeOff = totalTimePassed - timeAdded - timing[0].beatLength;
@@ -102,7 +108,7 @@ function startMap(circles) {
           checkEnd(1);
         });
 
-        addHitCircle(buttonID, circles[i].x, circles[i].y, 0.045, `#FF2BF4`, timing[0].beatLength);
+        addHitCircle(buttonID, circles[i].x, circles[i].y, 0.045, circleColor, timing[0].beatLength);
 
         circleRemoveTimeout = setTimeout(() => {
           removeButton(buttonID);
@@ -144,6 +150,7 @@ function parseHitObjects(hitObjects) {
   for(let i = 0; i < hitObjects.length; i++) {
     let temp = hitObjects[i].split(`,`);
     let hitObjectType = null;
+    let cycle = false;
 
     if (temp[3] == 0) {
       hitObjectType = 0;
@@ -151,6 +158,7 @@ function parseHitObjects(hitObjects) {
       hitObjectType = 0;
     } else if ((temp[3] > 3 && temp[3] < 7) || temp[3] == 2) {
       hitObjectType = 0;
+      cycle = true;
     }
 
     if (hitObjectType !== null) {
@@ -158,7 +166,8 @@ function parseHitObjects(hitObjects) {
         x: temp[0] === lastX ? temp[0]/512 * 0.6 + 0.21 : temp[0]/512 * 0.6 + 0.2,
         y: temp[1] === lastY ? temp[1]/384 * 0.8 + 0.11 : temp[1]/384 * 0.8 + 0.1,
         time: temp[2],
-        type: hitObjectType
+        type: hitObjectType,
+        cycle: cycle
       });
 
       lastX = temp[0];
@@ -175,4 +184,24 @@ function checkEnd(buttonsLeft) {
     console.log(`End score: ${score}`);
     drawLevelSelect();
   } 
+}
+
+function cycleCircleColors() {
+  switch(circleColor) {
+    case `#87007A`:
+      circleColor = `#BF0000`;
+      break;
+    case `#BF0000`:
+      circleColor = `#0077C7`;
+      break;
+    case `#0077C7`:
+      circleColor = `#00AD0C`;
+      break;
+    case `#00AD0C`:
+      circleColor = `#B8AE00`;
+      break;
+    case `#B8AE00`:
+      circleColor = `#87007A`;
+      break;
+  }
 }
