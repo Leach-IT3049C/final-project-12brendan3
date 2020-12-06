@@ -46,12 +46,9 @@ function getSongBlob(songFile) {
 }
 
 async function readLevelData(level) {
-  //level.mapdata
-  //level.music
-
   const songBlob = await getSongBlob(level.songFile);
-  const musicDataBase64 = await getBase64FromBlob(songBlob);
-  songSource.src = musicDataBase64;
+  const songDataBase64 = await getBase64FromBlob(songBlob);
+  songSource.src = songDataBase64;
   song.load();
 
   let lines = level.data.split('\r\n')

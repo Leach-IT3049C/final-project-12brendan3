@@ -14,3 +14,7 @@ canvas#game {
   background-color:#000000;
   */
 }
+
+canvas#game:hover {
+  cursor:none;
+}

@@ -19,6 +19,7 @@ function updateScreen(time) {
   totalTimePassed += timePassed;
 
   drawButtons();
+  drawCursor();
 
   if (currentGameMode !== `MainMenu`) {
     drawFPS();
@@ -110,6 +111,16 @@ function drawHitCircles() {
       context.stroke(path);
     }
   }
+}
+
+function drawCursor() {
+  const path = new Path2D();
+  path.arc(mousePos.x, mousePos.y, canvas.width * 0.01, 0, 2 * Math.PI);
+  const cursorGradient = context.createRadialGradient(mousePos.x, mousePos.y, canvas.width * 0.0025, mousePos.x, mousePos.y, canvas.width * 0.01);
+  cursorGradient.addColorStop(0, `#77EE44`);
+  cursorGradient.addColorStop(1, `rgba(128,128,128,0)`);
+  context.fillStyle = cursorGradient;
+  context.fill(path);
 }
 
 function clear() { // Clears canvas
