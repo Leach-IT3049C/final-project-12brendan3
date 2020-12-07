@@ -109,10 +109,7 @@ function startMap(circles) {
           removeHitCircle(buttonID);
           const timeOff = totalTimePassed - timeAdded - timing[0].beatLength;
           circleHit(timeOff);
-          if (checkEnd(1)){
-            song.pause();
-            song.currentTime = 0;
-          }
+          checkEnd(1);
         });
 
         addHitCircle(buttonID, circles[i].x, circles[i].y, 0.045, circleColor, timing[0].beatLength);
@@ -120,10 +117,7 @@ function startMap(circles) {
         circleRemoveTimeout = setTimeout(() => {
           removeButton(buttonID);
           circleMiss();
-          if (checkEnd(0)){
-            song.pause();
-            song.currentTime = 0;
-          }
+          checkEnd(0);
         }, timing[0].beatLength * 2);
       }, circles[i].time - timing[0].beatLength);
     }
@@ -194,11 +188,7 @@ function parseHitObjects(hitObjects) {
 
 function checkEnd(buttonsLeft) {
   if (objectsLeft <= 0 && buttons.length <= buttonsLeft) {
-    console.log(`End score: ${score}`);
     drawEndScreen();
-    return true;
-  } else {
-    return false;
   }
 }
 

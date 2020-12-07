@@ -19,7 +19,6 @@ function updateScreen(time) {
   totalTimePassed += timePassed;
 
   drawButtons();
-  drawCursor();
 
   if (currentGameMode !== `MainMenu`) {
     drawFPS();
@@ -34,7 +33,10 @@ function updateScreen(time) {
   if (currentGameMode === `EndScreen`){
     drawScore();
     drawCombo();
+    fadeOutSong();
   }
+  
+  drawCursor();
 
   window.requestAnimationFrame(updateScreen);
 }
