@@ -160,11 +160,10 @@ window.addEventListener(`resize`, () => {
 
 window.addEventListener(`keydown`, handleClick, false);
 
-canvas.addEventListener(`click`, handleClick);
+canvas.addEventListener(`mousedown`, handleClick);
 
 canvas.addEventListener('contextmenu', (event) => {
   event.preventDefault();
-  handleClick();
 });
 
 canvas.addEventListener(`mousemove`, (moveEvent) => {

@@ -154,6 +154,7 @@ function parseHitObjects(hitObjects) {
   let objs = [];
   let lastX = -1;
   let lastY = -1;
+  let totalOffset = 0;
   for(let i = 0; i < hitObjects.length; i++) {
     let temp = hitObjects[i].split(`,`);
     let hitObjectType = null;
@@ -169,13 +170,25 @@ function parseHitObjects(hitObjects) {
     }
 
     if (hitObjectType !== null) {
-      objs.push({
-        x: temp[0] === lastX ? temp[0]/512 * 0.6 + 0.21 : temp[0]/512 * 0.6 + 0.2,
-        y: temp[1] === lastY ? temp[1]/384 * 0.8 + 0.11 : temp[1]/384 * 0.8 + 0.1,
-        time: temp[2],
-        type: hitObjectType,
-        cycle: cycle
-      });
+      if (temp[0] === lastX && temp[1] === lastY) {
+        totalOffset++;
+        objs.push({
+          x: temp[0]/512 * 0.6 + 0.2 + 0.01 * totalOffset,
+          y: temp[1]/384 * 0.8 + 0.1 + 0.01 * totalOffset,
+          time: temp[2],
+          type: hitObjectType,
+          cycle: cycle
+        });
+      } else {
+        totalOffset = 0;
+        objs.push({
+          x: temp[0]/512 * 0.6 + 0.2,
+          y: temp[1]/384 * 0.8 + 0.1,
+          time: temp[2],
+          type: hitObjectType,
+          cycle: cycle
+        });
+      }
 
       lastX = temp[0];
       lastY = temp[1];

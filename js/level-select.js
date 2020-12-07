@@ -11,30 +11,30 @@ function drawLevelSelect() {
   
   let totalPages = Math.ceil(levelList.length / 5);
   
-  addRectButton(0.5, 0.1, 0.5, 0.15, `#60C`, `${levelList[5*currentPage-5].name} [${levelList[5*currentPage-5].difficulty}]`, 0.025, () => {
+  addRectButton(0.575, 0.1, 0.7, 0.15, `#60C`, `${levelList[5*currentPage-5].name} [${levelList[5*currentPage-5].difficulty}]`, 0.025, () => {
     startGameOsu(levelList[5*currentPage-5]);
   });
 
   if (levelList[5*currentPage-4]) {
-    addRectButton(0.5, 0.3, 0.5, 0.15, `#60C`, `${levelList[5*currentPage-4].name} [${levelList[5*currentPage-4].difficulty}]`, 0.025, () => {
+    addRectButton(0.575, 0.3, 0.7, 0.15, `#60C`, `${levelList[5*currentPage-4].name} [${levelList[5*currentPage-4].difficulty}]`, 0.025, () => {
       startGameOsu(levelList[5*currentPage-4]);
     });
   }
   
   if (levelList[5*currentPage-3]) {
-    addRectButton(0.5, 0.5, 0.5, 0.15, `#60C`, `${levelList[5*currentPage-3].name} [${levelList[5*currentPage-3].difficulty}]`, 0.025, () => {
+    addRectButton(0.575, 0.5, 0.7, 0.15, `#60C`, `${levelList[5*currentPage-3].name} [${levelList[5*currentPage-3].difficulty}]`, 0.025, () => {
       startGameOsu(levelList[5*currentPage-3]);
     });
   }
     
   if (levelList[5*currentPage-2]) {
-    addRectButton(0.5, 0.7, 0.5, 0.15, `#60C`, `${levelList[5*currentPage-2].name} [${levelList[5*currentPage-2].difficulty}]`, 0.025, () => {
+    addRectButton(0.575, 0.7, 0.7, 0.15, `#60C`, `${levelList[5*currentPage-2].name} [${levelList[5*currentPage-2].difficulty}]`, 0.025, () => {
       startGameOsu(levelList[5*currentPage-2]);
     });
   }
 
   if (levelList[5*currentPage-1]) {
-    addRectButton(0.5, 0.9, 0.5, 0.15, `#60C`, `${levelList[5*currentPage-1].name} [${levelList[5*currentPage-1].difficulty}]`, 0.025, () => {
+    addRectButton(0.575, 0.9, 0.7, 0.15, `#60C`, `${levelList[5*currentPage-1].name} [${levelList[5*currentPage-1].difficulty}]`, 0.025, () => {
       startGameOsu(levelList[5*currentPage-1]);
     });
   }
