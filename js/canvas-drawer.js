@@ -31,6 +31,11 @@ function updateScreen(time) {
     drawCombo();
   }
 
+  if (currentGameMode === `EndScreen`){
+    drawScore();
+    drawCombo();
+  }
+
   window.requestAnimationFrame(updateScreen);
 }
 

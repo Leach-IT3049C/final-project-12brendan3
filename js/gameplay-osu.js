@@ -6,6 +6,8 @@ let objectsLeft = 0;
 let circleColor = `#87007A`;
 let score = 0;
 let combo = 0;
+let maxCombo = 0;
+let lastLevel = null;
 
 
 function startGameOsu(level) {
@@ -16,6 +18,8 @@ function startGameOsu(level) {
   objectsLeft = 0;
   score = 0;
   combo = 0;
+  maxCombo = 0;
+  lastLevel = level;
   circleColor = `#87007A`;
   currentGameMode = `osu!`;
   readLevelData(level);
@@ -105,7 +109,10 @@ function startMap(circles) {
           removeHitCircle(buttonID);
           const timeOff = totalTimePassed - timeAdded - timing[0].beatLength;
           circleHit(timeOff);
-          checkEnd(1);
+          if (checkEnd(1)){
+            song.pause();
+            song.currentTime = 0;
+          }
         });
 
         addHitCircle(buttonID, circles[i].x, circles[i].y, 0.045, circleColor, timing[0].beatLength);
@@ -113,7 +120,10 @@ function startMap(circles) {
         circleRemoveTimeout = setTimeout(() => {
           removeButton(buttonID);
           circleMiss();
-          checkEnd(0);
+          if (checkEnd(0)){
+            song.pause();
+            song.currentTime = 0;
+          }
         }, timing[0].beatLength * 2);
       }, circles[i].time - timing[0].beatLength);
     }
@@ -140,6 +150,9 @@ function circleHit(timeOff) {
 }
 
 function circleMiss() {
+  if(combo > maxCombo){
+    maxCombo = combo;
+  }
   combo = 0;
 }
 
@@ -182,8 +195,11 @@ function parseHitObjects(hitObjects) {
 function checkEnd(buttonsLeft) {
   if (objectsLeft <= 0 && buttons.length <= buttonsLeft) {
     console.log(`End score: ${score}`);
-    drawLevelSelect();
-  } 
+    drawEndScreen();
+    return true;
+  } else {
+    return false;
+  }
 }
 
 function cycleCircleColors() {
