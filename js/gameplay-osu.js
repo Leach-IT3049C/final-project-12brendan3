@@ -95,14 +95,14 @@ function startMap(hitObjects) {
   for (let i = 0; i < hitObjects.length; i++) {
     setTimeout(() => { // This is a heavy way of loading everything in, we need a better solution for sure.
       objectsLeft--;
-      if (hitObjects[i].type === 0) {
+      if (hitObjects[i].type === `circle`) {
           let circleRemoveTimeout;
 
           const timeAdded = totalTimePassed;
 
           if (hitObjects[i].cycle > 0) {
             currentCircleColor += hitObjects[i].cycle;
-            if (currentCircleColor > 4) {
+            while (currentCircleColor > 4) {
               currentCircleColor = currentCircleColor - circleColors.length;
             }
           }
@@ -111,7 +111,6 @@ function startMap(hitObjects) {
             clearTimeout(circleRemoveTimeout);
             removeHitCircle(newButtonID);
             const timeOff = totalTimePassed - timeAdded - timing[0].beatLength * 1.5;
-            console.log(`${timeOff}ms`);
             circleHit(timeOff);
             checkEnd(1);
           });
@@ -123,7 +122,7 @@ function startMap(hitObjects) {
             circleMiss();
             checkEnd(0);
           }, timing[0].beatLength * 2);
-      } else if (hitObjects[i].type === 3) {
+      } else if (hitObjects[i].type === `spinner`) {
         const newSpinnerID = addSpinner();
 
         setTimeout(() => {
@@ -161,7 +160,7 @@ function circleMiss() {
   combo = 0;
 }
 
-function parseHitObjects(hitObjects) { // We're doiung this wrong in some way, it's not as straight forward as initially thought
+function parseHitObjects(hitObjects) {
   let objs = [];
   let lastX = -1;
   let lastY = -1;
@@ -172,28 +171,45 @@ function parseHitObjects(hitObjects) { // We're doiung this wrong in some way, i
     let cycle = 0;
     let spinnerTime = 0;
 
-    if (temp[3] == 0) {
-      hitObjectType = 0;
-    } else if (temp[3] == 1 && temp.length < 7) {
-      hitObjectType = 0;
-    } else if (temp[3] == 2 || (temp[3] > 3 && temp[3] < 7)) {
-      hitObjectType = 0;
-      if (temp[3] == 2) {
-        cycle = 1;
-      } else if (temp[3] == 4) {
-        cycle = 2;
-      } else if (temp[3] == 5) {
-        cycle = 3;
-      } else {
-        cycle = 4;
-      }
-    } else if (temp[3] == 3) {
-      hitObjectType = 3;
+    const binaryData = (temp[3] >>> 0).toString(2).padStart(8, 0);
+    console.log(binaryData);
+
+    if (binaryData.charAt(binaryData.length - 1) == 1) {
+      hitObjectType = `circle`;
+    } else if (binaryData.charAt(binaryData.length - 2) == 1) {
+      hitObjectType = `slider`;
+    } else if (binaryData.charAt(binaryData.length - 4) == 1) {
+      hitObjectType = `spinner`;
+    } else if (binaryData.charAt(binaryData.length - 8) == 1) {
+      hitObjectType = `hold`; // How??
+    }
+
+    if (hitObjectType === `spinner`) {
       spinnerTime = temp[5];
+      console.log(`set spinner time!`);
+    }
+
+    if (binaryData.charAt(binaryData.length - 3) == 1) {
+      console.log(`cycle!`);
+      cycle = 1;
+      if (binaryData.charAt(binaryData.length - 5) == 1) {
+        console.log(`cycle 1!`);
+        cycle += 1;
+      }
+  
+      if (binaryData.charAt(binaryData.length - 6) == 1) {
+        console.log(`cycle 2!`);
+        cycle += 2;
+      }
+  
+      if (binaryData.charAt(binaryData.length - 7) == 1) {
+        console.log(`cycle 4!`);
+        cycle += 4;
+      }
     }
 
     if (hitObjectType !== null) {
-      if (temp[0] === lastX && temp[1] === lastY && temp[3] != 3) {
+      if (temp[0] === lastX && temp[1] === lastY && (hitObjectType == `circle` || hitObjectType == `slider`)) {
         totalOffset++;
         objs.push({
           x: temp[0]/512 * 0.6 + 0.2 + 0.01 * totalOffset,

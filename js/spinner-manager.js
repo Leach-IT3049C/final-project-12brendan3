@@ -7,13 +7,13 @@ function addSpinner() {
 }
 
 function clearSpinners() { // Removes all Spinners
-  hitCircles = [];
+  spinners = [];
 }
 
 function removeSpinner(spinnerID) {
-  for (let i = 0; i < hitCircles.length; i++) {
-    if (hitCircles[i].id === spinnerID) {
-      hitCircles.splice(i, 1);
+  for (let i = 0; i < spinners.length; i++) {
+    if (spinners[i].id === spinnerID) {
+      spinners.splice(i, 1);
       break;
     }
   }
