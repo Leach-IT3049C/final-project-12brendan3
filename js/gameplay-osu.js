@@ -161,7 +161,7 @@ function circleMiss() {
   combo = 0;
 }
 
-function parseHitObjects(hitObjects) {
+function parseHitObjects(hitObjects) { // We're doiung this wrong in some way, it's not as straight forward as initially thought
   let objs = [];
   let lastX = -1;
   let lastY = -1;
