@@ -8,11 +8,12 @@ function addSpinner() {
 
 function clearSpinners() { // Removes all Spinners
   spinners = [];
+  spinnerID = 0;
 }
 
-function removeSpinner(spinnerID) {
+function removeSpinner(remSpinnerID) {
   for (let i = 0; i < spinners.length; i++) {
-    if (spinners[i].id === spinnerID) {
+    if (spinners[i].id === remSpinnerID) {
       spinners.splice(i, 1);
       break;
     }

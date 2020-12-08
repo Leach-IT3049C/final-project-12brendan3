@@ -95,12 +95,13 @@ function startMap(hitObjects) {
   for (let i = 0; i < hitObjects.length; i++) {
     setTimeout(() => { // This is a heavy way of loading everything in, we need a better solution for sure.
       objectsLeft--;
-      if (hitObjects[i].type === `circle`) {
+      if (hitObjects[i].type === `circle` || hitObjects[i].type === `slider`) {
           let circleRemoveTimeout;
 
           const timeAdded = totalTimePassed;
 
           if (hitObjects[i].cycle > 0) {
+            offset = i;
             currentCircleColor += hitObjects[i].cycle;
             while (currentCircleColor > 4) {
               currentCircleColor = currentCircleColor - circleColors.length;
@@ -122,7 +123,7 @@ function startMap(hitObjects) {
             circleMiss();
             checkEnd(0);
           }, timing[0].beatLength * 2);
-      } else if (hitObjects[i].type === `spinner`) {
+       } else if (hitObjects[i].type === `spinner`) {
         const newSpinnerID = addSpinner();
 
         setTimeout(() => {
@@ -166,13 +167,14 @@ function parseHitObjects(hitObjects) {
   let lastY = -1;
   let totalOffset = 0;
   for (let i = 0; i < hitObjects.length; i++) {
-    let temp = hitObjects[i].split(`,`);
+    const splitObjectData = hitObjects[i].split(`,`);
     let hitObjectType = null;
     let cycle = 0;
     let spinnerTime = 0;
+    let sliderCurveType = ``;
+    let sliderCurvePoints = [];
 
-    const binaryData = (temp[3] >>> 0).toString(2).padStart(8, 0);
-    console.log(binaryData);
+    const binaryData = (splitObjectData[3] >>> 0).toString(2).padStart(8, 0);
 
     if (binaryData.charAt(binaryData.length - 1) == 1) {
       hitObjectType = `circle`;
@@ -184,55 +186,61 @@ function parseHitObjects(hitObjects) {
       hitObjectType = `hold`; // How??
     }
 
+    if (hitObjectType === `slider`) {
+      let splitSliderData = splitObjectData[5].split(`|`);
+      sliderCurveType = splitSliderData[0];
+      splitSliderData.splice(0, 1);
+      sliderCurvePoints = splitSliderData;
+    }
+
     if (hitObjectType === `spinner`) {
-      spinnerTime = temp[5];
-      console.log(`set spinner time!`);
+      spinnerTime = splitObjectData[5];
     }
 
     if (binaryData.charAt(binaryData.length - 3) == 1) {
-      console.log(`cycle!`);
       cycle = 1;
       if (binaryData.charAt(binaryData.length - 5) == 1) {
-        console.log(`cycle 1!`);
         cycle += 1;
       }
   
       if (binaryData.charAt(binaryData.length - 6) == 1) {
-        console.log(`cycle 2!`);
         cycle += 2;
       }
   
       if (binaryData.charAt(binaryData.length - 7) == 1) {
-        console.log(`cycle 4!`);
         cycle += 4;
       }
     }
 
     if (hitObjectType !== null) {
-      if (temp[0] === lastX && temp[1] === lastY && (hitObjectType == `circle` || hitObjectType == `slider`)) {
+      if (splitObjectData[0] === lastX && splitObjectData[1] === lastY && (hitObjectType == `circle` || hitObjectType == `slider`)) {
         totalOffset++;
         objs.push({
-          x: temp[0]/512 * 0.6 + 0.2 + 0.01 * totalOffset,
-          y: temp[1]/384 * 0.8 + 0.1 + 0.01 * totalOffset,
-          time: temp[2],
+          x: splitObjectData[0]/512 * 0.6 + 0.2 + 0.01 * totalOffset,
+          y: splitObjectData[1]/384 * 0.8 + 0.1 + 0.01 * totalOffset,
+          time: splitObjectData[2],
           type: hitObjectType,
-          cycle: cycle,
-          spinnerTime: spinnerTime
+          cycle,
+          spinnerTime,
+          sliderCurveType,
+          sliderCurvePoints
         });
       } else {
         totalOffset = 0;
         objs.push({
-          x: temp[0]/512 * 0.6 + 0.2,
-          y: temp[1]/384 * 0.8 + 0.1,
-          time: temp[2],
+          x: splitObjectData[0]/512 * 0.6 + 0.2,
+          y: splitObjectData[1]/384 * 0.8 + 0.1,
+          time: splitObjectData[2],
           type: hitObjectType,
-          cycle: cycle,
-          spinnerTime: spinnerTime
+          cycle,
+          spinnerTime,
+          sliderCurveType,
+          sliderCurvePoints
         });
       }
 
-      lastX = temp[0];
-      lastY = temp[1];
+      lastX = splitObjectData[0];
+      lastY = splitObjectData[1];
       
       objectsLeft++;
     }

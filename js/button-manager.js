@@ -18,9 +18,9 @@ function clearButtons() { // Removes all buttons
   buttonID = 0;
 }
 
-function removeButton(buttonID) {
+function removeButton(remButtonID) {
   for (let i = 0; i < buttons.length; i++) {
-    if (buttons[i].id === buttonID) {
+    if (buttons[i].id === remButtonID) {
       buttons.splice(i, 1);
       break;
     }

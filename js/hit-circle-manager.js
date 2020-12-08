@@ -8,9 +8,9 @@ function clearHitCircles() { // Removes all Hit Circles
   hitCircles = [];
 }
 
-function removeHitCircle(circleID) {
+function removeHitCircle(remCircleID) {
   for (let i = 0; i < hitCircles.length; i++) {
-    if (hitCircles[i].id === circleID) {
+    if (hitCircles[i].id === remCircleID) {
       hitCircles.splice(i, 1);
       break;
     }
