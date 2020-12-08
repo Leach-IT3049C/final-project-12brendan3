@@ -3,7 +3,8 @@ let hitObjects = [];
 let difficulty = {};
 let timing = [];
 let objectsLeft = 0;
-let circleColor = `#87007A`;
+let circleColors = [`#1A74F2`, `#A420F0`, `#25B9EF`, `#17D174`, `#E22D7C`];
+let currentCircleColor = 0;
 let score = 0;
 let combo = 0;
 let maxCombo = 0;
@@ -20,7 +21,7 @@ function startGameOsu(level) {
   combo = 0;
   maxCombo = 0;
   lastLevel = level;
-  circleColor = `#87007A`;
+  currentCircleColor = 0;
   currentGameMode = `osu!`;
   readLevelData(level);
 }
@@ -91,6 +92,7 @@ async function readLevelData(level) {
 function startMap(circles) {
   song.play();
   let offset = 0;
+  console.log(circleColors[currentCircleColor]);
   for (let i = 0; i < circles.length; i++) {
     if (circles[i].type === 0) {
       setTimeout(() => {
@@ -99,12 +101,15 @@ function startMap(circles) {
 
         const timeAdded = totalTimePassed;
 
-        if (circles[i].cycle) {
-          cycleCircleColors();
-          offset = i;
+        if (circles[i].cycle > 0) {
+          currentCircleColor += circles[i].cycle;
+          if (currentCircleColor > 4) {
+            currentCircleColor = currentCircleColor - circleColors.length;
+          }
+          console.log(circleColors[currentCircleColor]);
         }
 
-        const buttonID = addCircleButton(circles[i].x, circles[i].y, 0.045, circleColor, i + 1 - offset, 0.04, () => {
+        const buttonID = addCircleButton(circles[i].x, circles[i].y, 0.045, circleColors[currentCircleColor], i + 1 - offset, 0.04, () => {
           clearTimeout(circleRemoveTimeout);
           removeHitCircle(buttonID);
           const timeOff = totalTimePassed - timeAdded - timing[0].beatLength;
@@ -112,7 +117,7 @@ function startMap(circles) {
           checkEnd(1);
         });
 
-        addHitCircle(buttonID, circles[i].x, circles[i].y, 0.045, circleColor, timing[0].beatLength);
+        addHitCircle(buttonID, circles[i].x, circles[i].y, 0.045, circleColors[currentCircleColor], timing[0].beatLength);
 
         circleRemoveTimeout = setTimeout(() => {
           removeButton(buttonID);
@@ -155,18 +160,28 @@ function parseHitObjects(hitObjects) {
   let lastX = -1;
   let lastY = -1;
   let totalOffset = 0;
-  for(let i = 0; i < hitObjects.length; i++) {
+  for (let i = 0; i < hitObjects.length; i++) {
     let temp = hitObjects[i].split(`,`);
     let hitObjectType = null;
-    let cycle = false;
+    let cycle = 0;
 
     if (temp[3] == 0) {
       hitObjectType = 0;
     } else if (temp[3] == 1 && temp.length < 7) {
       hitObjectType = 0;
-    } else if ((temp[3] > 3 && temp[3] < 7) || temp[3] == 2) {
+    } else if (temp[3] == 2 || (temp[3] > 3 && temp[3] < 7)) {
       hitObjectType = 0;
-      cycle = true;
+      if (temp[3] == 2) {
+        cycle = 1;
+      } else if (temp[3] == 4) {
+        cycle = 2;
+      } else if (temp[3] == 5) {
+        cycle = 3;
+      } else {
+        cycle = 4;
+      }
+    } else if (temp[3] == 3) {
+      hitObjectType = 3;
     }
 
     if (hitObjectType !== null) {
@@ -202,25 +217,5 @@ function parseHitObjects(hitObjects) {
 function checkEnd(buttonsLeft) {
   if (objectsLeft <= 0 && buttons.length <= buttonsLeft) {
     drawEndScreen();
-  }
-}
-
-function cycleCircleColors() {
-  switch(circleColor) {
-    case `#87007A`:
-      circleColor = `#BF0000`;
-      break;
-    case `#BF0000`:
-      circleColor = `#0077C7`;
-      break;
-    case `#0077C7`:
-      circleColor = `#00AD0C`;
-      break;
-    case `#00AD0C`:
-      circleColor = `#B8AE00`;
-      break;
-    case `#B8AE00`:
-      circleColor = `#87007A`;
-      break;
   }
 }
