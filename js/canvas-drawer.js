@@ -14,6 +14,7 @@ let currentGameMode = `MainMenu`;
 window.requestAnimationFrame(updateScreen);
 
 function updateScreen(time) {
+  clear();
   currentTime = time;
   timePassed = currentTime - lastTime;
   totalTimePassed += timePassed;
@@ -26,6 +27,7 @@ function updateScreen(time) {
 
   if (currentGameMode === `osu!`) {
     drawHitCircles();
+    drawSpinners();
     drawScore();
     drawCombo();
   }
@@ -42,8 +44,6 @@ function updateScreen(time) {
 }
 
 function drawButtons() { // Draws all buttons in array from button manager
-  clear();
-  
   for (let i = 0; i < buttons.length; i++) {
     const path = new Path2D();
 
@@ -117,6 +117,36 @@ function drawHitCircles() {
       context.lineWidth = radius * 0.05;
       context.stroke(path);
     }
+  }
+}
+
+function drawSpinners() {
+  for (let i = 0; i < spinners.length; i++) {
+    const pathBase = new Path2D();
+
+    pathBase.arc(canvas.width * 0.5, canvas.height * 0.5, canvas.width * 0.25, 0, 2 * Math.PI);
+
+    const spinnerGradient = context.createRadialGradient(canvas.width * 0.5, canvas.height * 0.5, canvas.width * 0.04, canvas.width * 0.5, canvas.height * 0.5, canvas.width * 0.4);
+
+    spinnerGradient.addColorStop(0, `rgba(0,75,175,0.5)`);
+    spinnerGradient.addColorStop(1, `rgba(0,0,0,0)`);
+    context.fillStyle = spinnerGradient;
+
+    context.fill(pathBase);
+
+    context.strokeStyle = `#FFF`;
+    context.lineWidth = canvas.width * 0.01;
+
+    context.stroke(pathBase);
+
+    const pathCenterPoint = new Path2D();
+
+    pathCenterPoint.arc(canvas.width * 0.5, canvas.height * 0.5, canvas.width * 0.005, 0, 2 * Math.PI);
+    
+    context.strokeStyle = `#FFF`;
+    context.lineWidth = canvas.width * 0.004;
+
+    context.stroke(pathCenterPoint);
   }
 }
 

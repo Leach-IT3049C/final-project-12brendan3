@@ -89,43 +89,49 @@ async function readLevelData(level) {
   startMap(parseHitObjects(hitObjects));
 }
 
-function startMap(circles) {
+function startMap(hitObjects) {
   song.play();
   let offset = 0;
-  console.log(circleColors[currentCircleColor]);
-  for (let i = 0; i < circles.length; i++) {
-    if (circles[i].type === 0) {
-      setTimeout(() => {
-        objectsLeft--;
-        let circleRemoveTimeout;
+  for (let i = 0; i < hitObjects.length; i++) {
+    setTimeout(() => { // This is a heavy way of loading everything in, we need a better solution for sure.
+      objectsLeft--;
+      if (hitObjects[i].type === 0) {
+          let circleRemoveTimeout;
 
-        const timeAdded = totalTimePassed;
+          const timeAdded = totalTimePassed;
 
-        if (circles[i].cycle > 0) {
-          currentCircleColor += circles[i].cycle;
-          if (currentCircleColor > 4) {
-            currentCircleColor = currentCircleColor - circleColors.length;
+          if (hitObjects[i].cycle > 0) {
+            currentCircleColor += hitObjects[i].cycle;
+            if (currentCircleColor > 4) {
+              currentCircleColor = currentCircleColor - circleColors.length;
+            }
           }
-          console.log(circleColors[currentCircleColor]);
-        }
 
-        const buttonID = addCircleButton(circles[i].x, circles[i].y, 0.045, circleColors[currentCircleColor], i + 1 - offset, 0.04, () => {
-          clearTimeout(circleRemoveTimeout);
-          removeHitCircle(buttonID);
-          const timeOff = totalTimePassed - timeAdded - timing[0].beatLength;
-          circleHit(timeOff);
-          checkEnd(1);
-        });
+          const newButtonID = addCircleButton(hitObjects[i].x, hitObjects[i].y, 0.045, circleColors[currentCircleColor], i + 1 - offset, 0.04, () => {
+            clearTimeout(circleRemoveTimeout);
+            removeHitCircle(newButtonID);
+            const timeOff = totalTimePassed - timeAdded - timing[0].beatLength * 1.5;
+            console.log(`${timeOff}ms`);
+            circleHit(timeOff);
+            checkEnd(1);
+          });
 
-        addHitCircle(buttonID, circles[i].x, circles[i].y, 0.045, circleColors[currentCircleColor], timing[0].beatLength);
+          addHitCircle(newButtonID, hitObjects[i].x, hitObjects[i].y, 0.045, circleColors[currentCircleColor], timing[0].beatLength * 1.5);
 
-        circleRemoveTimeout = setTimeout(() => {
-          removeButton(buttonID);
-          circleMiss();
+          circleRemoveTimeout = setTimeout(() => {
+            removeButton(newButtonID);
+            circleMiss();
+            checkEnd(0);
+          }, timing[0].beatLength * 2);
+      } else if (hitObjects[i].type === 3) {
+        const newSpinnerID = addSpinner();
+
+        setTimeout(() => {
+          removeSpinner(newSpinnerID);
           checkEnd(0);
-        }, timing[0].beatLength * 2);
-      }, circles[i].time - timing[0].beatLength);
-    }
+        }, hitObjects[i].spinnerTime - hitObjects[i].time);
+      }
+    }, hitObjects[i].time - timing[0].beatLength * 1.5);
   }
 }
 
@@ -164,6 +170,7 @@ function parseHitObjects(hitObjects) {
     let temp = hitObjects[i].split(`,`);
     let hitObjectType = null;
     let cycle = 0;
+    let spinnerTime = 0;
 
     if (temp[3] == 0) {
       hitObjectType = 0;
@@ -182,17 +189,19 @@ function parseHitObjects(hitObjects) {
       }
     } else if (temp[3] == 3) {
       hitObjectType = 3;
+      spinnerTime = temp[5];
     }
 
     if (hitObjectType !== null) {
-      if (temp[0] === lastX && temp[1] === lastY) {
+      if (temp[0] === lastX && temp[1] === lastY && temp[3] != 3) {
         totalOffset++;
         objs.push({
           x: temp[0]/512 * 0.6 + 0.2 + 0.01 * totalOffset,
           y: temp[1]/384 * 0.8 + 0.1 + 0.01 * totalOffset,
           time: temp[2],
           type: hitObjectType,
-          cycle: cycle
+          cycle: cycle,
+          spinnerTime: spinnerTime
         });
       } else {
         totalOffset = 0;
@@ -201,7 +210,8 @@ function parseHitObjects(hitObjects) {
           y: temp[1]/384 * 0.8 + 0.1,
           time: temp[2],
           type: hitObjectType,
-          cycle: cycle
+          cycle: cycle,
+          spinnerTime: spinnerTime
         });
       }
 
